@@ -19,7 +19,7 @@ root.render(
     </Canvas>
 
     <section className="section">
-      <h1>My Portfolio</h1>
+      <h1 className='dd'>My <span className='accent'>Portfolio</span></h1>
     </section>
     <section className="section">
       <h2>My projects</h2>

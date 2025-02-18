@@ -18,14 +18,30 @@ html {
   align-items: center;
   height: 100vh;
   position: relative;
-  font-family: "Cabin", sans-serif;
+  /* font-family: "Cabin", sans-serif; */
   /* color: #ffeded; */
   text-transform: uppercase;
-  font-size: 7vmin;
+  font-size: 76px;
   padding-left: 10%;
   padding-right: 10%;
+  
 }
 
 section:nth-child(odd) {
   justify-content: flex-end;
+}
+
+.dd {
+  /* font-size: 7vmin; */
+  /* line-height: 1.25;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  max-width: 960px; */
+}
+
+.accent {
+  background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
