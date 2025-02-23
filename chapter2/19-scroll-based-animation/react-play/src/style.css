@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 * {
   margin: 0;
   padding: 0;
@@ -15,23 +17,41 @@ html {
 
 .section {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   height: 100vh;
-  position: relative;
-  font-family: "Segoe UI";
-  /* font-family: var(--prism-font-family); */
-  /* color: #ffeded; */
-  text-transform: uppercase;
-  font-size: 64px;
   padding-left: 10%;
   padding-right: 10%;
+}
+
+.header {
+  height: 60px;
+}
+
+.body {
+  flex: 1;
+  font-family: "Inter var experimental", "Inter var", Inter, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+.footer {
+  height: 60px;
+  text-align: center;
 }
 
 section:nth-child(odd) {
   justify-content: flex-end;
 }
 
-.dd {
+.page-title-test {
+  text-transform: uppercase;
+  font-size: 64px;
+  font-weight: 900;
+}
+
+.page-title {
+  text-transform: uppercase;
+  font-size: 100px;
   font-weight: 900;
 }
 
@@ -41,3 +61,17 @@ section:nth-child(odd) {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+h1 {
+  font-size: 64px;
+  font-weight: 900;
+}
+
+.i-mingcute-right-line {
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z'/%3E%3Cpath fill='black' d='M15.707 11.293a1 1 0 0 1 0 1.414l-5.657 5.657a1 1 0 1 1-1.414-1.414l4.95-4.95l-4.95-4.95a1 1 0 0 1 1.414-1.414z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* .animate-bounce {
+  transform: translateY(-25%);
+  animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+} */

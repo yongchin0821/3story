@@ -19,15 +19,30 @@ root.render(
     </Canvas>
 
     <section className="section">
-      <h1 className="dd">
-        My <span className="accent">Portfolio</span>
-      </h1>
+      <div className="header"></div>
+      <div className="body flex flex-col justify-center">
+        <h1 className="page-title">
+          Date <span className="accent">Goverance</span>
+        </h1>
+        <h1>数聚治理</h1>
+        <p style={{ fontSize: "24px" }}>干净、整洁</p>
+      </div>
+      <div className="footer">
+        <div>dsda</div>
+        <span className="mt-8 animate-bounce">
+          <i className="i-mingcute-right-line rotate-90 text-2xl">ddd </i>
+        </span>
+      </div>
     </section>
     <section className="section">
-      <h2>My projects</h2>
+      <div className="body flex flex-col justify-center items-end">
+        <h1 className="page-title">My projects</h1>
+      </div>
     </section>
     <section className="section">
-      <h2>Contact me</h2>
+      <div className="body flex flex-col justify-center">
+        <h1 className="page-title">Contact me</h1>
+      </div>
     </section>
   </>
 );
