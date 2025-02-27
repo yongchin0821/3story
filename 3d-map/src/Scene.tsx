@@ -118,35 +118,36 @@ const Scene = () => {
     const randomIndex = Math.floor(Math.random() * geoData.length);
     const region = geoData[randomIndex];
     // console.log(region);
-    const centroid = region.properties.centroid || [0, 0]; // 假设有中心点数据
-    const x = centroid[0];
-    const y = centroid[1];
+    const centroid = region.properties.center || [0, 0]; // 假设有中心点数据
+    const x = centroid[0] - 110;
+    const y = centroid[1] - 35;
 
     // 重置 Light 初始状态
     const light = lightRef.current;
-    console.log(lightRef);
+    // console.log(lightRef);
     light.position.set(x, y, 0);
-    light.scale.setScalar(0);
+    light.scale.setScalar(1);
     light.children[0].material.opacity = 1;
 
     // 创建 GSAP 时间线
     const tl = gsap.timeline({
       onComplete: () => {
-        setTimeout(startAnimation, 3000); // 3秒后重复
+        setTimeout(startAnimation, 5000); // 3秒后重复
       },
     });
 
     // 动画阶段 1：前 2 秒放大并移动
     tl.to(light.scale, {
-      x: 1,
-      y: 1,
-      z: 1,
+      x: 2,
+      y: 2,
+      z: 2,
       duration: 2,
       ease: "power2.out",
     }).to(
       light.position,
       {
-        z: 10,
+        y: y + 2,
+        z: 1.5,
         duration: 2,
         ease: "power2.out",
       },
@@ -154,7 +155,7 @@ const Scene = () => {
     );
 
     // 动画阶段 2：最后 1 秒渐隐
-    tl.to(light.material, {
+    tl.to(light.children[0].material, {
       opacity: 0,
       duration: 1,
       ease: "power2.in",
@@ -170,7 +171,7 @@ const Scene = () => {
       }
     }, 3000); // 延迟 100ms
     return () => clearTimeout(timer);
-  }, [geoData, lightRef]);
+  }, [geoData]);
 
   return (
     <Canvas camera={{ position: [0, 0, 50], fov: 75 }}>
@@ -179,29 +180,29 @@ const Scene = () => {
       <directionalLight position={[10, 10, 5]} intensity={2} />
 
       {/* 地图主体 */}
-      <Center>
-        {geoData.length > 0 ? (
-          <>
-            <ChinaMap geoData={geoData} />
-            <axesHelper args={[5]} />
-          </>
-        ) : (
-          <mesh>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="gray" />
-          </mesh>
-        )}
-      </Center>
-      <group scale={5}>
-        <Light
-          ref={lightRef}
-          //   position-z={2}
-          //   rotation={[0, Math.PI * 0.5, Math.PI * 0.2]}
-        />
-      </group>
+      {/* <Center> */}
+      {geoData.length > 0 ? (
+        <>
+          <ChinaMap geoData={geoData} />
+          <axesHelper args={[5]} />
+          <group>
+            <Light
+              ref={lightRef}
+              position-z={2}
+              rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]}
+            />
+          </group>
+        </>
+      ) : (
+        <mesh>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="gray" />
+        </mesh>
+      )}
+      {/* </Center> */}
+
       {/* 交互控制 */}
       <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
-
       <axesHelper args={[5]} />
     </Canvas>
   );
