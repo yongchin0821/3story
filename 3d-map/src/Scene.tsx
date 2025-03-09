@@ -269,8 +269,6 @@ const Scene: React.FC = () => {
       });
   }, [geoData, refList, setSelectedRegionIndex]);
 
-  useEffect(() => {}, [startAnimation]);
-
   //fps
   const stats = new Stats();
   stats.showPanel(0);
