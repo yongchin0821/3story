@@ -1,6 +1,5 @@
-import React, { forwardRef, useEffect, useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
-import * as THREE from "three";
 
 const Lamp = forwardRef((props, ref) => {
   const { nodes, materials } = useGLTF("/lamp.glb");

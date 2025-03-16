@@ -291,7 +291,7 @@ const Scene: React.FC = () => {
   return (
     <group>
       <Center ref={chinaMapRef}>
-        <ChinaMap geoData={geoData} />
+        {/* <ChinaMap geoData={geoData} /> */}
         <Lamp ref={lampRef} rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]} />
         <Station
           ref={stationRef}

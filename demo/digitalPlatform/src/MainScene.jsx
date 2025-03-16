@@ -1,0 +1,63 @@
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import Map from "./components/Map";
+import Logo from "./components/Logo";
+
+/**
+ * Sizes
+ */
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+};
+
+/**
+ * Scroll
+ */
+let scrollY = window.scrollY;
+
+window.addEventListener("scroll", () => {
+  scrollY = window.scrollY;
+});
+
+/**
+ * Cursor
+ */
+const cursor = { x: 0, y: 0 };
+window.addEventListener("mousemove", (event) => {
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = event.clientY / sizes.height - 0.5;
+});
+
+export default function MainScene() {
+  const yy = useRef();
+  const objectDistance = 4;
+
+  useFrame((state, deltaTime) => {
+    state.camera.position.y = (-scrollY / sizes.height) * objectDistance;
+
+    yy.current.rotation.y +=
+      (cursor.x * 0.1 - yy.current.rotation.y) * 2 * deltaTime;
+    yy.current.rotation.x +=
+      (cursor.y * 0.1 - yy.current.rotation.x) * 2 * deltaTime;
+    yy.current.position.x +=
+      (cursor.x * 0.1 - yy.current.position.x) * 2 * deltaTime;
+    yy.current.position.y +=
+      (-cursor.y * 0.1 - yy.current.position.y) * 2 * deltaTime;
+  });
+  return (
+    <group>
+      <mesh position={[2, -objectDistance * 0, 0]} rotation={[-0.1, -0.2, 0]}>
+        <Logo ref={yy} />
+      </mesh>
+      <group
+        position={[-1.5, -objectDistance * 1, 0]}
+        scale={0.04}
+        rotation-x={-Math.PI * 0.1}
+      >
+        <Map />
+      </group>
+      <mesh position={[2, -objectDistance * 2, 0]}></mesh>
+    </group>
+  );
+}

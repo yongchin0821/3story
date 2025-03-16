@@ -1,4 +1,4 @@
-import React, { forwardRef,useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 
 const Battery = forwardRef((props, ref) => {
