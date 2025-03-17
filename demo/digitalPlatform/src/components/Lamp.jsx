@@ -2,35 +2,44 @@ import React, { forwardRef, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 
 const Lamp = forwardRef((props, ref) => {
-  // 使用 useMemo 缓存克隆的材质
-  // const material = useMemo(() => {
-  //   const clonedMaterial =
-  //     materials["tripo_mat_b022b425-82a8-4abc-88b6-7fb5c5e8b4ca"].clone();
-  //   clonedMaterial.transparent = true;
-  //   clonedMaterial.opacity = 1;
-  //   return clonedMaterial;
-  // }, [materials]);
-
   const { nodes, materials } = useGLTF("/lamp.glb");
+
+  // 使用 useMemo 缓存克隆的材质
+  const clonedMaterials = useMemo(() => {
+    const clonedMaterial1 = materials["SVGMat.004"].clone();
+    const clonedMaterial2 = materials["SVGMat.005"].clone();
+    const clonedMaterial3 = materials["SVGMat.006"].clone();
+
+    // 设置透明属性
+    clonedMaterial1.transparent = true;
+    clonedMaterial1.opacity = 1;
+    clonedMaterial2.transparent = true;
+    clonedMaterial2.opacity = 1;
+    clonedMaterial3.transparent = true;
+    clonedMaterial3.opacity = 1;
+
+    return [clonedMaterial1, clonedMaterial2, clonedMaterial3];
+  }, [materials]);
+
   return (
     <group {...props} ref={ref} dispose={null}>
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Curve002.geometry}
-        material={materials["SVGMat.004"]}
+        material={clonedMaterials[0]}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Curve002_1.geometry}
-        material={materials["SVGMat.005"]}
+        material={clonedMaterials[1]}
       />
       <mesh
         castShadow
         receiveShadow
         geometry={nodes.Curve002_2.geometry}
-        material={materials["SVGMat.006"]}
+        material={clonedMaterials[2]}
       />
     </group>
   );

@@ -12,9 +12,9 @@ const cardStyle = {
 };
 
 const SectionTwo = () => {
-  const animations = useRef([]);
-  const animations2 = useRef([]);
-  const animations3 = useRef([]);
+  const [animations, setAnimations] = useState([]);
+  const [animations2, setAnimations2] = useState([]);
+  const [animations3, setAnimations3] = useState([]);
 
   const batteryVal = useRef(123233);
   const lampVal = useRef(2332);
@@ -28,26 +28,26 @@ const SectionTwo = () => {
     switch (animeAtom.iconindex) {
       case 0:
         if (animeAtom.play) {
-          animations2.current = [{ id: id }];
+          setAnimations2([{ id: id }]);
           lampVal.current += 1;
         } else {
-          animations2.current = [];
+          setAnimations2([]);
         }
         break;
       case 1:
         if (animeAtom.play) {
-          animations3.current = [{ id: id }];
+          setAnimations3([{ id: id }]);
           stationVal.current += 1;
         } else {
-          animations3.current = [];
+          setAnimations3([]);
         }
         break;
       case 2:
         if (animeAtom.play) {
-          animations.current = [{ id: id }];
           batteryVal.current += 1;
+          setAnimations([{ id: id }]);
         } else {
-          animations.current = [];
+          setAnimations([]);
         }
         break;
     }
@@ -74,7 +74,7 @@ const SectionTwo = () => {
                     value={batteryVal.current}
                     style={{ fontWeight: 700 }}
                   />
-                  {animations.current.map((anim) => (
+                  {animations.map((anim) => (
                     <span key={anim.id} className="addcount">
                       +1
                     </span>
@@ -93,7 +93,7 @@ const SectionTwo = () => {
                     value={lampVal.current}
                     style={{ fontWeight: 700 }}
                   />
-                  {animations2.current.map((anim) => (
+                  {animations2.map((anim) => (
                     <span key={anim.id} className="addcount">
                       +1
                     </span>
@@ -112,7 +112,7 @@ const SectionTwo = () => {
                     value={stationVal.current}
                     style={{ fontWeight: 700 }}
                   />
-                  {animations3.current.map((anim) => (
+                  {animations3.map((anim) => (
                     <span key={anim.id} className="addcount">
                       +1
                     </span>

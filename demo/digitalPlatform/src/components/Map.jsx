@@ -154,11 +154,11 @@ const ChinaMap = ({ geoData, refList }) => {
     icon.scale.setScalar(1);
 
     // 确保 material 存在
-    console.log(icon);
-    // const material = icon.material;
-    // if (material.opacity !== undefined) {
-    //   material.opacity = 0.5;
-    // }
+    // console.log(icon);
+    const materials = icon.children.map((child) => child.material);
+    materials.forEach((material) => {
+      material.opacity = 0; // 初始设置为完全透明
+    });
 
     // 如果存在旧的时间轴，先清除
     if (timelineRef.current) {
@@ -174,13 +174,22 @@ const ChinaMap = ({ geoData, refList }) => {
     });
 
     timelineRef.current
-      .to(icon.scale, {
-        x: 3.5,
-        y: 3.5,
-        z: 3.5,
-        duration: 2,
-        ease: "bounce.out",
+      .to(materials, {
+        opacity: 1, // 淡入：从 0 到 1
+        duration: 1,
+        ease: "power2.in",
       })
+      .to(
+        icon.scale,
+        {
+          x: 3.5,
+          y: 3.5,
+          z: 3.5,
+          duration: 2,
+          ease: "bounce.out",
+        },
+        "<"
+      ) // 与淡入同时开始
       .to(
         icon.position,
         {
@@ -191,10 +200,15 @@ const ChinaMap = ({ geoData, refList }) => {
         },
         "<"
       )
-      .to([icon.children[0], icon.children[1]], {
-        opacity: 0,
+      .to(materials, {
+        opacity: 0, // 淡出：从 1 到 0
         duration: 1,
+        ease: "power2.out",
       });
+    // .to([icon.children[0], icon.children[1]], {
+    //   opacity: 0,
+    //   duration: 1,
+    // });
   }, [geoData, refList]);
 
   //fps
