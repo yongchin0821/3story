@@ -2,7 +2,7 @@ import React, { forwardRef, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 
 const Logo = forwardRef((props, ref) => {
-  const { nodes, materials } = useGLTF("/logo2.glb");
+  const { nodes, materials } = useGLTF("/logo.glb");
   // const material =
   //   materials["tripo_mat_b022b425-82a8-4abc-88b6-7fb5c5e8b4ca"].clone();
   // material.transparent = true;
@@ -34,6 +34,6 @@ const Logo = forwardRef((props, ref) => {
   );
 });
 
-useGLTF.preload("/logo2.glb");
+useGLTF.preload("/logo.glb");
 
 export default Logo;

@@ -59,7 +59,9 @@ const SectionTwo = () => {
           <h1 className="page-title2" style={{ marginBottom: 28 }}>
             全方位运营护航
           </h1>
-          <h2 style={{ fontSize: "24px", marginBottom: 28 }}>全方位运营护航</h2>
+          <h2 style={{ fontSize: "24px", marginBottom: 28 }}>
+            治理赋能,稳健前行
+          </h2>
           <Card style={cardStyle}>
             <Card.Meta
               avatar={<Avatar shape="square" src={"/protect.svg"} size={60} />}
