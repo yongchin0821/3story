@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAtomValue } from "jotai";
 import { motion } from "motion/react";
 import { countAtom } from "./atoms";
@@ -12,40 +12,42 @@ const cardStyle = {
 };
 
 const SectionTwo = () => {
-  const [animations, setAnimations] = useState([]);
-  const [animations2, setAnimations2] = useState([]);
-  const [animations3, setAnimations3] = useState([]);
+  const animations = useRef([]);
+  const animations2 = useRef([]);
+  const animations3 = useRef([]);
 
-  const [batteryVal, setBatteryVal] = useState(123233);
-  const [lampVal, setLampVal] = useState(2332);
-  const [stationVal, setStationVal] = useState(2222);
+  const batteryVal = useRef(123233);
+  const lampVal = useRef(2332);
+  const stationVal = useRef(2222);
+
   const animeAtom = useAtomValue(countAtom);
+  console.log("Sectwo");
 
   useEffect(() => {
     const id = Date.now();
     switch (animeAtom.iconindex) {
       case 0:
         if (animeAtom.play) {
-          setAnimations2([{ id: id }]);
-          setLampVal(lampVal + 1);
+          animations2.current = [{ id: id }];
+          lampVal.current += 1;
         } else {
-          // setAnimations2([]);
+          animations2.current = [];
         }
         break;
       case 1:
         if (animeAtom.play) {
-          setAnimations3([{ id: id }]);
-          setStationVal(stationVal + 1);
+          animations3.current = [{ id: id }];
+          stationVal.current += 1;
         } else {
-          // setAnimations3([]);
+          animations3.current = [];
         }
         break;
       case 2:
         if (animeAtom.play) {
-          setAnimations((prev) => [...prev, { id }]);
-          setBatteryVal(batteryVal + 1);
+          animations.current = [{ id: id }];
+          batteryVal.current += 1;
         } else {
-          // setAnimations([]);
+          animations.current = [];
         }
         break;
     }
@@ -69,14 +71,14 @@ const SectionTwo = () => {
                 <>
                   <Statistic
                     title="累计换电（单）"
-                    value={batteryVal}
+                    value={batteryVal.current}
                     style={{ fontWeight: 700 }}
                   />
-                  {/* {animations.map((anim) => {
+                  {animations.current.map((anim) => (
                     <span key={anim.id} className="addcount">
                       +1
-                    </span>;
-                  })} */}
+                    </span>
+                  ))}
                 </>
               }
             ></Card.Meta>
@@ -88,14 +90,14 @@ const SectionTwo = () => {
                 <>
                   <Statistic
                     title="累计设备预警（次）"
-                    value={lampVal}
+                    value={lampVal.current}
                     style={{ fontWeight: 700 }}
                   />
-                  {/* {animations2.map((anim) => {
+                  {animations2.current.map((anim) => (
                     <span key={anim.id} className="addcount">
                       +1
-                    </span>;
-                  })} */}
+                    </span>
+                  ))}
                 </>
               }
             ></Card.Meta>
@@ -107,14 +109,14 @@ const SectionTwo = () => {
                 <>
                   <Statistic
                     title="累计抢救车站（座）"
-                    value={stationVal}
+                    value={stationVal.current}
                     style={{ fontWeight: 700 }}
                   />
-                  {/* {animations3.map((anim) => {
+                  {animations3.current.map((anim) => (
                     <span key={anim.id} className="addcount">
                       +1
-                    </span>;
-                  })} */}
+                    </span>
+                  ))}
                 </>
               }
             ></Card.Meta>
