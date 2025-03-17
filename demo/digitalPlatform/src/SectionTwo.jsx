@@ -62,7 +62,7 @@ const SectionTwo = () => {
           <h2 style={{ fontSize: "24px", marginBottom: 28 }}>全方位运营护航</h2>
           <Card style={cardStyle}>
             <Card.Meta
-              avatar={<Avatar shape="square" src={"/battery.svg"} size={60} />}
+              avatar={<Avatar shape="square" src={"/protect.svg"} size={60} />}
               description={
                 <>
                   <Statistic
@@ -100,7 +100,7 @@ const SectionTwo = () => {
           </Card>
           <Card style={cardStyle}>
             <Card.Meta
-              avatar={<Avatar shape="square" src={"/battery.svg"} size={60} />}
+              avatar={<Avatar shape="square" src={"/star.svg"} size={60} />}
               description={
                 <>
                   <Statistic

@@ -55,6 +55,9 @@ const SectionThree = () => {
           ></Card.Meta>
         </Card>
       </div>
+      <div style={{zIndex:'1'}}>
+        <img src="/ai.svg" className="section-img"></img>
+      </div>
     </div>
   );
 };

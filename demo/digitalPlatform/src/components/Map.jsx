@@ -13,9 +13,9 @@ import React, {
 } from "react";
 import * as THREE from "three";
 import { countAtom, selectedRegionIndexAtom } from "../atoms";
-import Battery from "./Battery";
+import Protect from "./Protect";
 import Lamp from "./Lamp";
-import Station from "./Station";
+import Star from "./Star";
 import Stats from "stats.js";
 
 // 常量抽离
@@ -154,10 +154,11 @@ const ChinaMap = ({ geoData, refList }) => {
     icon.scale.setScalar(1);
 
     // 确保 material 存在
-    const material = icon.material;
-    if (material.opacity !== undefined) {
-      material.opacity = 0.5;
-    }
+    console.log(icon);
+    // const material = icon.material;
+    // if (material.opacity !== undefined) {
+    //   material.opacity = 0.5;
+    // }
 
     // 如果存在旧的时间轴，先清除
     if (timelineRef.current) {
@@ -190,7 +191,7 @@ const ChinaMap = ({ geoData, refList }) => {
         },
         "<"
       )
-      .to(material, {
+      .to([icon.children[0], icon.children[1]], {
         opacity: 0,
         duration: 1,
       });
@@ -229,11 +230,11 @@ const ChinaMap = ({ geoData, refList }) => {
   );
 };
 
-const Scene = () => {
+const Map = () => {
   // const geoData = useGeoData(
   //   "https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json"
   // );
-  console.log("Sence重新渲染");
+  console.log("Map重新渲染");
   const url = "/geodata.json";
   const [geoData, setGeoData] = useState([]);
 
@@ -263,14 +264,11 @@ const Scene = () => {
     <group>
       <Center ref={chinaMapRef}>
         <ChinaMap geoData={geoData} refList={refList} />
-        <Lamp ref={lampRef} rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]} />
-        <Station
-          ref={stationRef}
-          rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]}
-        />
-        <Battery
+        <Lamp ref={lampRef} rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]} />
+        <Star ref={stationRef} rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]} />
+        <Protect
           ref={batteryRef}
-          rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]}
+          rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]}
         />
         {/* <axesHelper args={[5]} /> */}
       </Center>
@@ -278,4 +276,4 @@ const Scene = () => {
   );
 };
 
-export default Scene;
+export default Map;
