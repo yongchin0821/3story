@@ -58,7 +58,7 @@ const SectionTwo = () => {
       <div className="flex justify-between">
         <div className="order-1"></div>
         <div className="order-2">
-          <h1 className="page-title2" style={{ marginBottom: 28 }}>
+          <h1 className="home-title2" style={{ marginBottom: 28 }}>
             全方位运营护航
           </h1>
           <h2 style={{ fontSize: "24px", marginBottom: 28 }}>
@@ -70,12 +70,12 @@ const SectionTwo = () => {
               description={
                 <>
                   <Statistic
-                    title="累计换电（单）"
+                    title="累计下单（单）"
                     value={batteryVal.current}
                     style={{ fontWeight: 700 }}
                   />
                   {animations.map((anim) => (
-                    <span key={anim.id} className="addcount">
+                    <span key={anim.id} className="count-float">
                       +1
                     </span>
                   ))}
@@ -94,7 +94,7 @@ const SectionTwo = () => {
                     style={{ fontWeight: 700 }}
                   />
                   {animations2.map((anim) => (
-                    <span key={anim.id} className="addcount">
+                    <span key={anim.id} className="count-float">
                       +1
                     </span>
                   ))}
@@ -108,12 +108,12 @@ const SectionTwo = () => {
               description={
                 <>
                   <Statistic
-                    title="累计抢救车站（座）"
+                    title="累计抢救站点（座）"
                     value={stationVal.current}
                     style={{ fontWeight: 700 }}
                   />
                   {animations3.map((anim) => (
-                    <span key={anim.id} className="addcount">
+                    <span key={anim.id} className="count-float">
                       +1
                     </span>
                   ))}

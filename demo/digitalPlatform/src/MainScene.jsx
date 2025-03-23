@@ -45,6 +45,7 @@ export default function MainScene() {
     yy.current.position.y +=
       (-cursor.y * 0.1 - yy.current.position.y) * 2 * deltaTime;
   });
+  console.log("mainScene渲染");
   return (
     <group>
       <mesh position={[2, -objectDistance * 0, 0]} rotation={[-0.1, -0.2, 0]}>

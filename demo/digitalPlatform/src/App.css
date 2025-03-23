@@ -40,20 +40,20 @@ html {
   text-align: center;
 }
 
-.page-title {
+.home-title {
   text-transform: uppercase;
   font-size: 100px;
   font-weight: 9000;
 }
 
-.accent {
+.font-gradient {
   background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.page-title2 {
+.home-title2 {
   font-size: 56px;
   font-weight: 800;
 }
@@ -76,7 +76,7 @@ html {
   }
 }
 
-.addcount {
+.count-float {
   position: absolute;
   top: 42px;
   left: 190px;

@@ -80,8 +80,8 @@ const SectionOne = () => {
     <>
       <div className="header"></div>
       <div className="body flex flex-col justify-center">
-        <h1 className="page-title">
-          Data<span className="accent">Governance</span>
+        <h1 className="home-title">
+          Smart<span className="font-gradient">Digital</span>
         </h1>
         <TypingText />
       </div>
