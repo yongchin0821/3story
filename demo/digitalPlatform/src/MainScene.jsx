@@ -30,26 +30,26 @@ window.addEventListener("mousemove", (event) => {
 });
 
 export default function MainScene() {
-  const yy = useRef();
+  const logo = useRef();
   const objectDistance = 4;
 
   useFrame((state, deltaTime) => {
     state.camera.position.y = (-scrollY / sizes.height) * objectDistance;
 
-    yy.current.rotation.y +=
-      (cursor.x * 0.1 - yy.current.rotation.y) * 2 * deltaTime;
-    yy.current.rotation.x +=
-      (cursor.y * 0.1 - yy.current.rotation.x) * 2 * deltaTime;
-    yy.current.position.x +=
-      (cursor.x * 0.1 - yy.current.position.x) * 2 * deltaTime;
-    yy.current.position.y +=
-      (-cursor.y * 0.1 - yy.current.position.y) * 2 * deltaTime;
+    logo.current.rotation.y +=
+      (cursor.x * 0.1 - logo.current.rotation.y) * 2 * deltaTime;
+    logo.current.rotation.x +=
+      (cursor.y * 0.1 - logo.current.rotation.x) * 2 * deltaTime;
+    logo.current.position.x +=
+      (cursor.x * 0.1 - logo.current.position.x) * 2 * deltaTime;
+    logo.current.position.y +=
+      (-cursor.y * 0.1 - logo.current.position.y) * 2 * deltaTime;
   });
   console.log("mainScene渲染");
   return (
     <group>
       <mesh position={[2, -objectDistance * 0, 0]} rotation={[-0.1, -0.2, 0]}>
-        <Logo ref={yy} />
+        <Logo ref={logo} />
       </mesh>
       <group
         position={[-1.5, -objectDistance * 1, 0]}

@@ -28,7 +28,7 @@ const TypingText = () => {
     },
   };
   const spanVal = "质量中心数字化智慧平台";
-  const spanVal2 = "掌握数据,引领变革";
+  const spanVal2 = "数据为翼,治理为舵";
 
   return (
     <motion.div
@@ -87,7 +87,7 @@ const SectionOne = () => {
       </div>
 
       <div className="footer">
-        <div className="mb-2">登云之上,方能望远</div>
+        <div className="mb-2">加速世界向可持续能源的转变</div>
         <span className="mt-15">
           <DownOutlined className="animate-bounce" />
         </span>

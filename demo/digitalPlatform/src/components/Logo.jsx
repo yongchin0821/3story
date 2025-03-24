@@ -10,10 +10,8 @@ const Logo = forwardRef((props, ref) => {
 
   // 使用 useMemo 缓存克隆的材质
   const material = useMemo(() => {
-    const clonedMaterial = materials["SVGMat.016"].clone();
-    const clonedMaterial2 = materials["SVGMat.014"].clone();
-
-    return [clonedMaterial, clonedMaterial2];
+    const clonedMaterial = materials["SVGMat"].clone();
+    return clonedMaterial;
   }, [materials]);
 
   return (
@@ -21,14 +19,8 @@ const Logo = forwardRef((props, ref) => {
       <mesh
         castShadow
         receiveShadow
-        geometry={nodes.Curve026.geometry}
-        material={material[0]}
-      />
-      <mesh
-        castShadow
-        receiveShadow
-        geometry={nodes.Curve026_1.geometry}
-        material={material[1]}
+        geometry={nodes.Curve.geometry}
+        material={material}
       />
     </group>
   );

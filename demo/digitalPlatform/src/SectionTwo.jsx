@@ -59,10 +59,10 @@ const SectionTwo = () => {
         <div className="order-1"></div>
         <div className="order-2">
           <h1 className="home-title2" style={{ marginBottom: 28 }}>
-            全方位运营护航
+            数据织网综合系统
           </h1>
           <h2 style={{ fontSize: "24px", marginBottom: 28 }}>
-            治理赋能,稳健前行
+            构建全域联动的数据生态，赋能精准决策与高效协同‌
           </h2>
           <Card style={cardStyle}>
             <Card.Meta
