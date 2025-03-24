@@ -13,9 +13,9 @@ import React, {
 } from "react";
 import * as THREE from "three";
 import selectedRegionIndexAtom from "./atoms";
-import Battery from "./components/Battery";
 import Lamp from "./components/Lamp";
-import Station from "./components/Station";
+import Star from "./components/Star";
+import Protect from "./components/Protect";
 import Stats from "stats.js";
 
 // 常量抽离
@@ -221,10 +221,10 @@ const Scene: React.FC = () => {
     icon.scale.setScalar(1);
 
     // 确保 material 存在
-    const material = icon.material as THREE.Material & { opacity?: number };
-    if (material.opacity !== undefined) {
-      material.opacity = 0.5;
-    }
+    const materials = icon.children.map((child) => child.material);
+    materials.forEach((material) => {
+      material.opacity = 0; // 初始设置为完全透明
+    });
 
     // 如果存在旧的时间轴，先清除
     if (timelineRef.current) {
@@ -238,34 +238,37 @@ const Scene: React.FC = () => {
       },
     });
 
-    // const tl = gsap.timeline({
-    //   onComplete: () => {
-    //     setSelectedRegionIndex(null);
-    //     setTimeout(startAnimation, 3000);
-    //   },
-    // });
-
     timelineRef.current
-      .to(icon.scale, {
-        x: 2,
-        y: 2,
-        z: 2,
-        duration: 2,
-        ease: "power2.out",
+      .to(materials, {
+        opacity: 1, // 淡入：从 0 到 1
+        duration: 1,
+        ease: "power2.in",
       })
+      .to(
+        icon.scale,
+        {
+          x: 3.5,
+          y: 3.5,
+          z: 3.5,
+          duration: 2,
+          ease: "bounce.out",
+        },
+        "<"
+      ) // 与淡入同时开始
       .to(
         icon.position,
         {
-          y: y + 2,
+          y: y + 3,
           z: 2.5,
           duration: 2,
           ease: "power2.out",
         },
         "<"
       )
-      .to(material, {
-        opacity: 0,
+      .to(materials, {
+        opacity: 0, // 淡出：从 1 到 0
         duration: 1,
+        ease: "power2.out",
       });
   }, [geoData, refList, setSelectedRegionIndex]);
 
@@ -291,15 +294,12 @@ const Scene: React.FC = () => {
   return (
     <group>
       <Center ref={chinaMapRef}>
-        {/* <ChinaMap geoData={geoData} /> */}
-        <Lamp ref={lampRef} rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]} />
-        <Station
-          ref={stationRef}
-          rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]}
-        />
-        <Battery
+        <ChinaMap geoData={geoData} />
+        <Lamp ref={lampRef} rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]} />
+        <Star ref={stationRef} rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]} />
+        <Protect
           ref={batteryRef}
-          rotation={[Math.PI * 0.1, Math.PI * 0.5, 0]}
+          rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]}
         />
         {/* <axesHelper args={[5]} /> */}
       </Center>
