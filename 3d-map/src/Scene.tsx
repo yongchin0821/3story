@@ -64,6 +64,11 @@ const buildShapes = (feature: Feature): THREE.Shape[] => {
   return shapes;
 };
 
+//fps
+const stats = new Stats();
+stats.showPanel(0);
+document.body.appendChild(stats.dom);
+
 interface MapShapeProps {
   feature: Feature;
   index: number;
@@ -101,7 +106,7 @@ const MapShape: React.FC<MapShapeProps> = memo(
     // 事件处理使用 useCallback
     const handlePointerOver = useCallback(() => {
       setHovered(true);
-      console.log("Region:", feature.properties.name);
+      // console.log("Region:", feature.properties.name);
     }, [feature.properties.name]);
 
     const handlePointerOut = useCallback(() => {
@@ -137,76 +142,34 @@ interface ChinaMapProps {
   geoData: Feature[];
 }
 
-const ChinaMap: React.FC<ChinaMapProps> = ({ geoData }) => {
-  console.log("ChinaMap重新渲染");
-  const [selectedRegionIndex] = useAtom(selectedRegionIndexAtom);
-  return (
-    <group name="chinaMapGroup">
-      {geoData.map((feature, index) => (
-        <MapShape
-          key={feature.properties.adcode || index}
-          feature={feature}
-          index={index}
-          isSelected={index === selectedRegionIndex}
-        />
-      ))}
-    </group>
-  );
+// 工具函数：计算区域中心（备用，当 feature.properties.center 不存在时）
+const calculateShapeCenter = (coordinates: number[][][][] | number[][][]) => {
+  let xSum = 0,
+    ySum = 0,
+    count = 0;
+  const coords = Array.isArray(coordinates[0][0][0])
+    ? coordinates[0][0]
+    : coordinates[0];
+  coords.forEach(([lng, lat]) => {
+    const [x, y] = transformCoord([lng, lat]);
+    xSum += x;
+    ySum += y;
+    count++;
+  });
+  return [xSum / count, ySum / count];
 };
 
-const Scene: React.FC = () => {
-  // const geoData = useGeoData(
-  //   "https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json"
-  // );
-  console.log("Sence重新渲染");
-  const url = "/geodata.json";
-  const [geoData, setGeoData] = useState<Feature[]>([]);
-  useEffect(() => {
-    const fetchGeoJSON = async () => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-        data.features.pop(); // 移除最后一个元素
-        setGeoData(data.features);
-      } catch (error) {
-        console.error("Failed to fetch GeoJSON:", error);
-      }
-    };
-    fetchGeoJSON();
-  }, [url]);
-
-  const [, setSelectedRegionIndex] = useAtom(selectedRegionIndexAtom);
-  const chinaMapRef = useRef<THREE.Group>(null);
-  const lampRef = useRef<THREE.Mesh>(null);
-  const stationRef = useRef<THREE.Mesh>(null);
-  const batteryRef = useRef<THREE.Mesh>(null);
+const ChinaMap: React.FC<ChinaMapProps> = ({ geoData, refList }) => {
+  console.log("ChinaMap重新渲染");
+  const [selectedRegionIndex] = useAtom(selectedRegionIndexAtom);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
-  // 工具函数：计算区域中心（备用，当 feature.properties.center 不存在时）
-  const calculateShapeCenter = (coordinates: number[][][][] | number[][][]) => {
-    let xSum = 0,
-      ySum = 0,
-      count = 0;
-    const coords = Array.isArray(coordinates[0][0][0])
-      ? coordinates[0][0]
-      : coordinates[0];
-    coords.forEach(([lng, lat]) => {
-      const [x, y] = transformCoord([lng, lat]);
-      xSum += x;
-      ySum += y;
-      count++;
-    });
-    return [xSum / count, ySum / count];
-  };
-
-  const refList = [lampRef, stationRef, batteryRef];
+  const [, setSelectedRegionIndex] = useAtom(selectedRegionIndexAtom);
 
   const startAnimation = useCallback(() => {
     if (!geoData.length) return;
     const randomIndex = Math.floor(Math.random() * geoData.length);
     const iconIndex = Math.floor(Math.random() * refList.length);
     const region = geoData[randomIndex];
-    console.log(chinaMapRef.current?.children[0].children[0]);
     setSelectedRegionIndex(randomIndex);
 
     const iconRef = refList[iconIndex];
@@ -272,19 +235,14 @@ const Scene: React.FC = () => {
       });
   }, [geoData, refList, setSelectedRegionIndex]);
 
-  //fps
-  const stats = new Stats();
-  stats.showPanel(0);
-  document.body.appendChild(stats.dom);
-
   useFrame((state, deltaTime) => {
     stats.begin();
     const nowSecond = Math.floor(state.clock.elapsedTime);
     if (nowSecond !== currentSecond) {
-      console.log(nowSecond, currentSecond);
+      // console.log(nowSecond, currentSecond);
       currentSecond = nowSecond;
       if (!(currentSecond % 4)) {
-        console.log("startAnimation");
+        // console.log("startAnimation");
         startAnimation();
       }
     }
@@ -292,9 +250,52 @@ const Scene: React.FC = () => {
   });
 
   return (
+    <group name="chinaMapGroup">
+      {geoData.map((feature, index) => (
+        <MapShape
+          key={feature.properties.adcode || index}
+          feature={feature}
+          index={index}
+          isSelected={index === selectedRegionIndex}
+        />
+      ))}
+    </group>
+  );
+};
+
+const Scene: React.FC = () => {
+  // const geoData = useGeoData(
+  //   "https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json"
+  // );
+  console.log("Sence重新渲染");
+  const url = "/geodata.json";
+  const [geoData, setGeoData] = useState<Feature[]>([]);
+
+  useEffect(() => {
+    const fetchGeoJSON = async () => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        data.features.pop(); // 移除最后一个元素
+        setGeoData(data.features);
+      } catch (error) {
+        console.error("Failed to fetch GeoJSON:", error);
+      }
+    };
+    fetchGeoJSON();
+  }, [url]);
+
+  const chinaMapRef = useRef<THREE.Group>(null);
+  const lampRef = useRef<THREE.Mesh>(null);
+  const stationRef = useRef<THREE.Mesh>(null);
+  const batteryRef = useRef<THREE.Mesh>(null);
+  const refList = [lampRef, stationRef, batteryRef];
+
+  return (
     <group>
       <Center ref={chinaMapRef}>
-        <ChinaMap geoData={geoData} />
+        <ChinaMap geoData={geoData} refList={refList} />
         <Lamp ref={lampRef} rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]} />
         <Star ref={stationRef} rotation={[Math.PI * 0.1, -Math.PI * 0.5, 0]} />
         <Protect
