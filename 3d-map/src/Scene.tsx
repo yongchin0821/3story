@@ -84,7 +84,7 @@ const MapShape: React.FC<MapShapeProps> = memo(
       color: "#ffffff",
       Linecolor: "#151d1c",
     });
-    console.log(feature.properties.adcode);
+    // console.log(feature.properties.adcode);
     // 使用 useMemo 缓存计算结果
     const shapes = useMemo(() => buildShapes(feature), [feature]);
 
@@ -235,7 +235,7 @@ const ChinaMap: React.FC<ChinaMapProps> = ({ geoData, refList }) => {
       });
   }, [geoData, refList, setSelectedRegionIndex]);
 
-  useFrame((state, deltaTime) => {
+  useFrame((state) => {
     stats.begin();
     const nowSecond = Math.floor(state.clock.elapsedTime);
     if (nowSecond !== currentSecond) {
