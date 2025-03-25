@@ -125,6 +125,11 @@ const calculateShapeCenter = (coordinates) => {
   return [xSum / count, ySum / count];
 };
 
+//fps
+const stats = new Stats();
+stats.showPanel(0);
+document.body.appendChild(stats.dom);
+
 const ChinaMap = ({ geoData, refList }) => {
   // console.log("ChinaMap重新渲染");
   const [selectedRegionIndex, setSelectedRegionIndex] = useAtom(
@@ -210,11 +215,6 @@ const ChinaMap = ({ geoData, refList }) => {
     //   duration: 1,
     // });
   }, [geoData, refList]);
-
-  //fps
-  const stats = new Stats();
-  stats.showPanel(0);
-  document.body.appendChild(stats.dom);
 
   useFrame((state) => {
     stats.begin();
