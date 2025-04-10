@@ -53,18 +53,18 @@ const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture });
 const poleLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffe5 });
 
 // Portal light material
-const portalLightMaterial = new THREE.ShaderMaterial({ 
+const portalLightMaterial = new THREE.ShaderMaterial({
   vertexShader: portalVertexShader,
   fragmentShader: portalFragmentShader,
   transparent: true,
   uniforms: {
-    uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
-    uSize: { value: 50.0 },
     uTime: { value: 0 },
+    uColorStart: { value: new THREE.Color('#D5FFFD') },
+    uColorEnd: { value: new THREE.Color(0xffffff) },
   },
   // blending: THREE.AdditiveBlending,
   // depthWrite: false, //解决粒子重叠遮挡问题
- });
+});
 
 /**
  * Model
@@ -217,6 +217,7 @@ const tick = () => {
 
   // Update utime
   firefliesMaterial.uniforms.uTime.value = elapsedTime;
+  portalLightMaterial.uniforms.uTime.value = elapsedTime;
 
   // Update controls
   controls.update();
