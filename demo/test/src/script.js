@@ -10,8 +10,8 @@ import simVertex from "./shaders/simVertex.glsl";
 /**
  * Base
  */
-const size = 128;
-
+const size = 256;
+let time = 0;
 /**
  * Sizes
  */
@@ -66,8 +66,8 @@ for (let i = 0; i < size; i++) {
 
     data[index + 0] = r * Math.cos(theta);
     data[index + 1] = r * Math.sin(theta);
-    data[index + 2] = 1.;
-    data[index + 3] = 1.;
+    data[index + 2] = 1;
+    data[index + 3] = 1;
   }
 }
 
@@ -86,6 +86,7 @@ const fboMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uPositions: { value: fboTexture },
     uInfo: { value: null },
+    uMouse: { value: new THREE.Vector2(0, 0) },
     uTime: { value: 0 },
   },
   vertexShader: simVertex,
@@ -99,8 +100,8 @@ for (let i = 0; i < size; i++) {
     let index = (i + j * size) * 4;
     infoArray[index + 0] = 0.5 + Math.random();
     infoArray[index + 1] = 0.5 + Math.random();
-    infoArray[index + 2] = 1.;
-    infoArray[index + 3] = 1.;
+    infoArray[index + 2] = 1;
+    infoArray[index + 3] = 1;
   }
 }
 
@@ -195,9 +196,34 @@ const camera = new THREE.PerspectiveCamera(
   0.001,
   1000
 );
-camera.position.set(0, 0, 2);
+camera.position.set(0, 0, 4);
 scene.add(camera);
 
+/**
+ * raycaster
+ */
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+const setupEvents = () => {
+  const dummy = new THREE.Mesh(
+    new THREE.PlaneGeometry(100, 100),
+    new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide })
+  );
+  document.addEventListener("pointermove", (event) => {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(pointer, camera);
+    let intersects = raycaster.intersectObject(dummy);
+    if (intersects.length > 0) {
+      let { x, y } = intersects[0].point;
+      fboMaterial.uniforms.uMouse.value = new THREE.Vector2(x, y);
+    }
+  });
+};
+setupEvents();
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
@@ -209,7 +235,7 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
-
+  time += 0.01;
   //Update material
   material.uniforms.uTime.value = elapsedTime;
   fboMaterial.uniforms.uTime.value = elapsedTime;
