@@ -1,9 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import GUI from "lil-gui";
 import fragment from "./shaders/fragment.glsl";
 import vertex from "./shaders/vertexParticles.glsl";
-
 import simFragment from "./shaders/simFragment.glsl";
 import simVertex from "./shaders/simVertex.glsl";
 
