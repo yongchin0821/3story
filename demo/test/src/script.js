@@ -1,9 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import fragment from "./shaders/fragment.glsl";
-import vertex from "./shaders/vertexParticles.glsl";
-import simFragment from "./shaders/simFragment.glsl";
-import simVertex from "./shaders/simVertex.glsl";
+import vertex from "./shaders/vertex.glsl";
+import fragmentFBO from "./shaders/fbo.glsl";
 
 /**
  * Base
@@ -26,6 +24,8 @@ const canvas = document.querySelector("canvas.webgl");
  */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
+  antialias: true,
+  alpha: false,
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -35,140 +35,13 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  * @returns
  */
 function getRenderTarget() {
-  const renderTarget = new THREE.WebGLRenderTarget(sizes.width, sizes.height, {
-    minFilter: THREE.NearestFilter,
-    magFilter: THREE.NearestFilter,
-    format: THREE.RGBAFormat,
-    type: THREE.FloatType,
-  });
+  const renderTarget = new THREE.WebGLRenderTarget(sizes.width, sizes.height);
   return renderTarget;
 }
-
-let fbo = getRenderTarget();
-let fbo1 = getRenderTarget();
-
-const fboScene = new THREE.Scene();
-const fboCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);
-fboCamera.position.set(0, 0, 0.5);
-fboCamera.lookAt(0, 0, 0);
-
-const fboGeometry = new THREE.PlaneGeometry(2, 2);
-
-let data = new Float32Array(size * size * 4);
-
-for (let i = 0; i < size; i++) {
-  for (let j = 0; j < size; j++) {
-    let index = (i + j * size) * 4;
-    let theta = Math.random() * Math.PI * 2;
-    let r = 0.5 + Math.random() * 0.5;
-
-    data[index + 0] = r * Math.cos(theta);
-    data[index + 1] = r * Math.sin(theta);
-    data[index + 2] = 1;
-    data[index + 3] = 1;
-  }
-}
-
-const fboTexture = new THREE.DataTexture(
-  data,
-  size,
-  size,
-  THREE.RGBAFormat,
-  THREE.FloatType
-);
-fboTexture.magFilter = THREE.NearestFilter;
-fboTexture.minFilter = THREE.NearestFilter;
-fboTexture.needsUpdate = true;
-
-const fboMaterial = new THREE.ShaderMaterial({
-  uniforms: {
-    uPositions: { value: fboTexture },
-    uInfo: { value: null },
-    uMouse: { value: new THREE.Vector2(0, 0) },
-    uTime: { value: 0 },
-  },
-  vertexShader: simVertex,
-  fragmentShader: simFragment,
-});
-
-let infoArray = new Float32Array(size * size * 4);
-
-for (let i = 0; i < size; i++) {
-  for (let j = 0; j < size; j++) {
-    let index = (i + j * size) * 4;
-    infoArray[index + 0] = 0.5 + Math.random();
-    infoArray[index + 1] = 0.5 + Math.random();
-    infoArray[index + 2] = 1;
-    infoArray[index + 3] = 1;
-  }
-}
-
-const info = new THREE.DataTexture(
-  infoArray,
-  size,
-  size,
-  THREE.RGBAFormat,
-  THREE.FloatType
-);
-info.magFilter = THREE.NearestFilter;
-info.minFilter = THREE.NearestFilter;
-info.needsUpdate = true;
-fboMaterial.uniforms.uInfo.value = info;
-
-const fboMesh = new THREE.Mesh(fboGeometry, fboMaterial);
-fboScene.add(fboMesh);
-
-renderer.setRenderTarget(fbo);
-renderer.render(fboScene, fboCamera);
-renderer.setRenderTarget(fbo1);
-renderer.render(fboScene, fboCamera);
 
 /**
  * Test mesh
  */
-// Scene
-const scene = new THREE.Scene();
-
-// Geometry
-const count = size ** 2;
-
-let geometry = new THREE.BufferGeometry();
-let positions = new Float32Array(count * 3);
-let uv = new Float32Array(count * 2);
-for (let i = 0; i < size; i++) {
-  for (let j = 0; j < size; j++) {
-    let index = i + j * size;
-    positions[index * 3 + 0] = Math.random();
-    positions[index * 3 + 1] = Math.random();
-    positions[index * 3 + 2] = 0;
-
-    uv[index * 2 + 0] = i / size;
-    uv[index * 2 + 1] = j / size;
-  }
-}
-geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-
-// Material
-const material = new THREE.ShaderMaterial({
-  vertexShader: vertex,
-  fragmentShader: fragment,
-  //   wireframe: true,
-  transparent: true,
-  uniforms: {
-    uTime: { value: 0 },
-    uPositions: { value: null },
-    resolution: {
-      value: new THREE.Vector4(),
-    },
-  },
-  side: THREE.DoubleSide,
-});
-
-// Points
-material.uniforms.uPositions.value = fboTexture;
-const points = new THREE.Points(geometry, material);
-scene.add(points);
 
 window.addEventListener("resize", () => {
   // Update sizes
@@ -184,6 +57,8 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+const scene = new THREE.Scene();
+
 /**
  * Camera
  */
@@ -191,37 +66,71 @@ window.addEventListener("resize", () => {
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
-  0.001,
+  0.01,
   1000
 );
-camera.position.set(0, 0, 8);
+camera.position.set(0, 0, 2);
 scene.add(camera);
 
 /**
  * raycaster
  */
-
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
+const sourceTarget = new THREE.WebGLRenderTarget(sizes.width, sizes.height);
+let targetA = getRenderTarget();
+let targetB = getRenderTarget();
+
+const fboScene = new THREE.Scene();
+const fboCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const fboMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    tDiffuse: { value: null },
+    tPrev: { value: null },
+    resolution: { value: new THREE.Vector4(sizes.width, sizes.height, 1, 1) },
+  },
+  vertexShader: vertex,
+  fragmentShader: fragmentFBO,
+});
+
+const fboQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), fboMaterial);
+fboScene.add(fboQuad);
+
+const finalScene = new THREE.Scene();
+const finalQuad = new THREE.Mesh(
+  new THREE.PlaneGeometry(2, 2),
+  new THREE.MeshBasicMaterial({ map: targetA.texture })
+);
+finalScene.add(finalQuad);
+
 const setupEvents = () => {
-  const dummy = new THREE.Mesh(
+  const raycastPlane = new THREE.Mesh(
     new THREE.PlaneGeometry(100, 100),
-    new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ color: 0xfefefe, side: THREE.DoubleSide })
   );
-  document.addEventListener("pointermove", (event) => {
+
+  const dummy = new THREE.Mesh(
+    new THREE.SphereGeometry(0.05, 20, 20),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+
+  scene.add(dummy);
+
+  window.addEventListener("mousemove", (event) => {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(pointer, camera);
-    let intersects = raycaster.intersectObject(dummy);
+    const intersects = raycaster.intersectObject(raycastPlane);
     if (intersects.length > 0) {
-      let { x, y } = intersects[0].point;
-      fboMaterial.uniforms.uMouse.value = new THREE.Vector2(x, y);
+      dummy.position.copy(intersects[0].point);
     }
   });
 };
+
 setupEvents();
+
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
@@ -234,25 +143,28 @@ const clock = new THREE.Clock();
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   time += 0.01;
-  //Update material
-  material.uniforms.uTime.value = elapsedTime;
-  fboMaterial.uniforms.uTime.value = elapsedTime;
 
   // Update controls
   controls.update();
 
-  fboMaterial.uniforms.uPositions.value = fbo1.texture;
-  material.uniforms.uPositions.value = fbo.texture;
-
-  // Render
-  renderer.setRenderTarget(fbo);
-  renderer.render(fboScene, fboCamera);
-  renderer.setRenderTarget(null);
+  // rendering the source
+  renderer.setRenderTarget(sourceTarget);
   renderer.render(scene, camera);
 
-  let temp = fbo;
-  fbo = fbo1;
-  fbo1 = temp;
+  // // running ping pong
+  renderer.setRenderTarget(targetA);
+  renderer.render(fboScene, fboCamera);
+  fboMaterial.uniforms.tDiffuse.value = sourceTarget.texture;
+  fboMaterial.uniforms.tPrev.value = targetA.texture;
+
+  finalQuad.material.map = targetA.texture;
+  renderer.setRenderTarget(null);
+  renderer.render(finalScene, fboCamera);
+
+  let temp = targetA;
+  targetA = targetB;
+  targetB = temp;
+
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 };
