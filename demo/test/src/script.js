@@ -19,44 +19,6 @@ const sizes = {
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
 
-/**
- * Renderer
- */
-const renderer = new THREE.WebGLRenderer({
-  canvas: canvas,
-  antialias: true,
-  alpha: false,
-});
-renderer.setSize(sizes.width, sizes.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-/**
- * fbo mesh
- * @returns
- */
-function getRenderTarget() {
-  const renderTarget = new THREE.WebGLRenderTarget(sizes.width, sizes.height);
-  return renderTarget;
-}
-
-/**
- * Test mesh
- */
-
-window.addEventListener("resize", () => {
-  // Update sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-
-  // Update camera
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
-
-  // Update renderer
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
-
 const scene = new THREE.Scene();
 
 /**
@@ -73,36 +35,35 @@ camera.position.set(0, 0, 2);
 scene.add(camera);
 
 /**
+ * Renderer
+ */
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  antialias: true,
+  alpha: false,
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+window.addEventListener("resize", () => {
+  // Update sizes
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  // Update camera
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  // Update renderer
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+});
+
+/**
  * raycaster
  */
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
-
-const sourceTarget = new THREE.WebGLRenderTarget(sizes.width, sizes.height);
-let targetA = getRenderTarget();
-let targetB = getRenderTarget();
-
-const fboScene = new THREE.Scene();
-const fboCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-const fboMaterial = new THREE.ShaderMaterial({
-  uniforms: {
-    tDiffuse: { value: null },
-    tPrev: { value: null },
-    resolution: { value: new THREE.Vector4(sizes.width, sizes.height, 1, 1) },
-  },
-  vertexShader: vertex,
-  fragmentShader: fragmentFBO,
-});
-
-const fboQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), fboMaterial);
-fboScene.add(fboQuad);
-
-const finalScene = new THREE.Scene();
-const finalQuad = new THREE.Mesh(
-  new THREE.PlaneGeometry(2, 2),
-  new THREE.MeshBasicMaterial({ map: targetA.texture })
-);
-finalScene.add(finalQuad);
 
 const setupEvents = () => {
   const raycastPlane = new THREE.Mesh(
@@ -131,6 +92,67 @@ const setupEvents = () => {
 
 setupEvents();
 
+/**
+ * fbo mesh
+ * @returns
+ */
+function getRenderTarget() {
+  const renderTarget = new THREE.WebGLRenderTarget(sizes.width, sizes.height);
+  return renderTarget;
+}
+
+const whiteTarget = getRenderTarget();
+const whiteScene = new THREE.Scene();
+const whitebg = new THREE.Mesh(
+  new THREE.PlaneGeometry(100, 100),
+  new THREE.MeshBasicMaterial({ color: 0xffffff })
+);
+whiteScene.add(whitebg);
+// whitebg.position.z = -1;
+
+const box = new THREE.Mesh(
+  new THREE.BoxGeometry(0.3, 0.3, 0.3),
+  new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+);
+whiteScene.add(box);
+
+renderer.setRenderTarget(null);
+renderer.render(whiteScene, camera);
+
+/**
+ * final scene
+ * This scene will be used to render the final output
+ */
+const sourceTarget = getRenderTarget();
+let targetA = getRenderTarget();
+let targetB = getRenderTarget();
+
+// renderer.setRenderTarget(whiteTarget);
+// renderer.render(whiteScene, camera);
+
+const a = whiteTarget.texture;
+const fboScene = new THREE.Scene();
+const fboCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const fboMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    tDiffuse: { value: null },
+    tPrev: { value: whiteTarget.texture },
+    resolution: { value: new THREE.Vector4(sizes.width, sizes.height, 1, 1) },
+  },
+  vertexShader: vertex,
+  fragmentShader: fragmentFBO,
+});
+
+const fboQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), fboMaterial);
+fboScene.add(fboQuad);
+
+const finalScene = new THREE.Scene();
+const finalQuad = new THREE.Mesh(
+  new THREE.PlaneGeometry(2, 2),
+  new THREE.MeshBasicMaterial({ map: targetA.texture })
+);
+finalScene.add(finalQuad);
+
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
@@ -139,6 +161,9 @@ controls.enableDamping = true;
  * Animate
  */
 const clock = new THREE.Clock();
+
+renderer.setRenderTarget(whiteTarget);
+renderer.render(whiteScene, camera);
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
@@ -154,6 +179,7 @@ const tick = () => {
   // // running ping pong
   renderer.setRenderTarget(targetA);
   renderer.render(fboScene, fboCamera);
+
   fboMaterial.uniforms.tDiffuse.value = sourceTarget.texture;
   fboMaterial.uniforms.tPrev.value = targetA.texture;
 
