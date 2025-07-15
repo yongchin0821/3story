@@ -1,5 +1,6 @@
 uniform sampler2D tDiffuse;
 uniform sampler2D tPrev;
+uniform float tTime;
 uniform vec4 resolution;
 varying vec2 vUv;
 
@@ -42,6 +43,45 @@ vec3 blendDarken(vec3 base, vec3 blend, float opacity) {
     return (blendDarken(base, blend) * opacity + base * (1.0 - opacity));
 }
 
+float hue2rgb(float f1, float f2, float hue) {
+    if (hue < 0.0)
+        hue += 1.0;
+    else if (hue > 1.0)
+        hue -= 1.0;
+    float res;
+    if ((6.0 * hue) < 1.0)
+        res = f1 + (f2 - f1) * 6.0 * hue;
+    else if ((2.0 * hue) < 1.0)
+        res = f2;
+    else if ((3.0 * hue) < 2.0)
+        res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0;
+    else
+        res = f1;
+    return res;
+}
+
+vec3 hsl2rgb(vec3 hsl) {
+    vec3 rgb;
+    if(hsl.y == 0.0) {
+        rgb = vec3(hsl.z);
+    } else {
+        float f2;
+        if(hsl.z < 0.5)
+            f2 = hsl.z * (1.0 + hsl.y);
+        else
+            f2 = hsl.z + hsl.y - hsl.y * hsl.z;
+        float f1 = 2.0 * hsl.z - f2;
+        rgb.r = hue2rgb(f1, f2, hsl.x + (1.0 / 3.0));
+        rgb.g = hue2rgb(f1, f2, hsl.x);
+        rgb.b = hue2rgb(f1, f2, hsl.x - (1.0 / 3.0));
+    }
+    return rgb;
+}
+
+vec3 hsl2rgb(float h, float s, float l) {
+    return hsl2rgb(vec3(h, s, l));
+}
+
 vec3 bgColor = vec3(1., 1., 1.);
 //mesh
 void main() {
@@ -61,9 +101,11 @@ void main() {
     floodColor = blendDarken(floodColor, texel3.rgb);
     floodColor = blendDarken(floodColor, texel4.rgb);
     floodColor = blendDarken(floodColor, texel5.rgb);
-    // gl_FragColor = vec4(vUv, 0.0, 1.0);
-    // gl_FragColor = color + prev * 0.9;
-    // gl_FragColor = prev * 0.9;
+
+    vec3 gradient = hsl2rgb(fract(tTime*0.1), 0.5, 0.5);
+
+    vec3 waterColor = blendDarken(prev.rgb, floodColor * (1. + 0.02), 0.3); //0.3控制泛光效果
     gl_FragColor = texel3;
-    gl_FragColor = vec4(floodColor, 1.);
+    gl_FragColor = vec4(waterColor, 1.);
+    gl_FragColor = vec4(gradient.rgb, 1.);
 }
