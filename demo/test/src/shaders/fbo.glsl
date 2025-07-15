@@ -44,16 +44,16 @@ vec3 blendDarken(vec3 base, vec3 blend, float opacity) {
 }
 
 float hue2rgb(float f1, float f2, float hue) {
-    if (hue < 0.0)
+    if(hue < 0.0)
         hue += 1.0;
-    else if (hue > 1.0)
+    else if(hue > 1.0)
         hue -= 1.0;
     float res;
-    if ((6.0 * hue) < 1.0)
+    if((6.0 * hue) < 1.0)
         res = f1 + (f2 - f1) * 6.0 * hue;
-    else if ((2.0 * hue) < 1.0)
+    else if((2.0 * hue) < 1.0)
         res = f2;
-    else if ((3.0 * hue) < 2.0)
+    else if((3.0 * hue) < 2.0)
         res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0;
     else
         res = f1;
@@ -63,7 +63,7 @@ float hue2rgb(float f1, float f2, float hue) {
 vec3 hsl2rgb(vec3 hsl) {
     vec3 rgb;
     if(hsl.y == 0.0) {
-        rgb = vec3(hsl.z);
+        rgb = vec3(hsl.z); // Luminance
     } else {
         float f2;
         if(hsl.z < 0.5)
@@ -90,7 +90,7 @@ void main() {
 
     vec2 aspect = vec2(1., resolution.y / resolution.x);
 
-    vec2 disp = fbm(vUv * 22., 4) * aspect * 0.005; // displacement based on fbm
+    vec2 disp = fbm(vUv * 22., 4) * aspect * 0.01; // displacement based on fbm
     vec4 texel = texture2D(tPrev, vUv);
     vec4 texel2 = texture2D(tPrev, vec2(vUv.x + disp.x, vUv.y));
     vec4 texel3 = texture2D(tPrev, vec2(vUv.x - disp.x, vUv.y));
@@ -102,10 +102,16 @@ void main() {
     floodColor = blendDarken(floodColor, texel4.rgb);
     floodColor = blendDarken(floodColor, texel5.rgb);
 
-    vec3 gradient = hsl2rgb(fract(tTime*0.1), 0.5, 0.5);
+    vec3 gradient = hsl2rgb(fract(tTime * 0.1), 0.5, 0.5);
+    vec3 lcolor = mix(vec3(1.), gradient, color.r);
 
-    vec3 waterColor = blendDarken(prev.rgb, floodColor * (1. + 0.02), 0.3); //0.3控制泛光效果
-    gl_FragColor = texel3;
-    gl_FragColor = vec4(waterColor, 1.);
-    gl_FragColor = vec4(gradient.rgb, 1.);
+    vec3 waterColor = blendDarken(prev.rgb, floodColor * (1. + 0.02), 0.6); //0.3控制泛光效果
+
+    vec3 finalColor = blendDarken(waterColor, lcolor, 0.5); // 混合水色和光照颜色
+    // gl_FragColor = texel3;
+    // gl_FragColor = vec4(waterColor, 1.);
+    // gl_FragColor = vec4(gradient.rgb, 1.);
+    // gl_FragColor = vec4(lcolor.rgb, 1.);
+    // gl_FragColor = vec4(finalColor, 1.);
+    gl_FragColor = vec4(min(bgColor, finalColor * (1. + 0.01) + 0.001), 1.); // 实现淡出效果
 }

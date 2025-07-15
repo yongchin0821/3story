@@ -72,7 +72,7 @@ const setupEvents = () => {
   );
 
   const dummy = new THREE.Mesh(
-    new THREE.SphereGeometry(0.05, 20, 20),
+    new THREE.SphereGeometry(0.15, 30, 30),
     new THREE.MeshBasicMaterial({ color: 0xffffff })
   );
 
@@ -135,6 +135,7 @@ const fboScene = new THREE.Scene();
 const fboCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 const fboMaterial = new THREE.ShaderMaterial({
   uniforms: {
+    tTime: { value: 0 },
     tDiffuse: { value: null },
     tPrev: { value: whiteTarget.texture },
     resolution: { value: new THREE.Vector4(sizes.width, sizes.height, 1, 1) },
@@ -155,7 +156,7 @@ finalScene.add(finalQuad);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+controls.enableDamping = false;
 
 /**
  * Animate
@@ -182,6 +183,7 @@ const tick = () => {
 
   fboMaterial.uniforms.tDiffuse.value = sourceTarget.texture;
   fboMaterial.uniforms.tPrev.value = targetA.texture;
+  fboMaterial.uniforms.tTime.value = time;
 
   finalQuad.material.map = targetA.texture;
   renderer.setRenderTarget(null);
